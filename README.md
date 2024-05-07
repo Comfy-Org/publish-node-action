@@ -8,6 +8,12 @@ Uses [comfy-cli](https://github.com/Comfy-Org/comfy-cli) to publish the current 
 
 Please finish the guide [here](http://localhost:3000/custom-nodes/overview#publishing-to-the-registry) for publishing to the registry befre continuing.
 
+Make sure you have:
+
+- [ ] Created a publisher
+- [ ] Created a personal access token
+- [ ] Generated a pyproject.toml file for your custom node
+
 ### Add Personal Access Token to Secrets
 
 Add the personal access token you created on the registry website to your Github Secrets.
