@@ -4,19 +4,25 @@ Uses [comfy-cli](https://github.com/Comfy-Org/comfy-cli) to publish the current 
 
 ## Getting Started
 
-### Create a Publisher
+### Publish Node
 
-You need to create a publisher on the registry before publishing. Follow the instructions [here](http://localhost:3000/custom-nodes/overview#publishing-to-the-registry).
+Please finish the guide [here](http://localhost:3000/custom-nodes/overview#publishing-to-the-registry) for publishing to the registry befre continuing.
 
-### Initialize Custom Node
+### Add Personal Access Token to Secrets
 
-If you have never published to the registry before, [create](https://comfydocs.org/custom-nodes/overview#add-metadata) a pyproject.toml file for your custom node.
+Add the personal access token you created on the registry website to your Github Secrets.
+
+Go to Settings -> Secrets and Variables -> Actions -> New repository secret.
+
+Create a secret called `REGISTRY_ACCESS_TOKEN`.
+
+![Repository Secrets](images/repo_secrets.png)
+
+![Add Secret](images/add_secret.png)
 
 ### Publish when pyproject.toml changes
 
-Create a file in your custom node repository called: `.github/workflows/publish_custom_node.yml`
-
-Copy this into the file:
+The easiest way to publish custom node versions is to create this Github Actions workflow that runs everytime `pyproject.toml` changes. When you want to publish a new version, simply go and update the version field to the next version and commit it to main.
 
 ```yaml
 name: "Publish to Comfy registry"
@@ -37,10 +43,8 @@ jobs:
       - name: Publish Custom Node
         uses: comfy-org/node-publish-action@main # TODO replace when published.
         with:
-          personal_access_token: ${{ secrets.GITHUB_TOKEN }} ## Add your own personal access token to your Github secrets and reference it here.
+          personal_access_token: ${{ secrets.REGISTRY_ACCESS_TOKEN }} ## Add your own personal access token to your Github secrets and reference it here.
 ```
-
-If you haven't yet, follow the instructions [here](https://comfydocs.org) to create a Publisher on the registry portal and a Personal Access Token. A personal access token is required to authenticate publishing node versions from Github Actions.
 
 ### Version Numbers
 
