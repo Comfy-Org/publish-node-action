@@ -1,4 +1,4 @@
-# node-publish-action
+# publish-node-action
 
 Uses [comfy-cli](https://github.com/Comfy-Org/comfy-cli) to publish the current version of your custom node to the [registry](https://comfyregistry.org). The goal is to create an easy way for developers to publish updates to their custom node to the registry.
 
