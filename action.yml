@@ -17,10 +17,11 @@ runs:
       shell: bash
       run: |
           pip install comfy-cli
-    - name: Enable Tracking
+    - name: Disables Tracking (--yes accepts tracking, and then we disable it)
       shell: bash
       run: |
-          comfy tracking enable 
+          comfy --yes env 
+          comfy tracking disable
     - name: Publish Node
       shell: bash
       run: |
