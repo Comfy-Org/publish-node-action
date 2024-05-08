@@ -17,8 +17,12 @@ runs:
       shell: bash
       run: |
           pip install comfy-cli
-    - name: Publish Custom Node
+    - name: Enable Tracking
       shell: bash
       run: |
-          comfy tracking enable && comfy node publish --token ${{ inputs.personal_access_token }}
+          comfy tracking enable 
+    - name: Publish Node
+      shell: bash
+      run: |
+          comfy node publish --token ${{ inputs.personal_access_token }}
     
