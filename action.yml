@@ -16,7 +16,7 @@ runs:
     - name: Install comfy-cli
       shell: bash
       run: |
-          pip install comfy-cli==0.0.21.dev1
+          pip install comfy-cli
     - name: Disables Tracking (--yes accepts tracking, and then we disable it)
       shell: bash
       run: |
