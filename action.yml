@@ -17,13 +17,9 @@ runs:
       shell: bash
       run: |
           pip install comfy-cli
-    - name: Disables Tracking (--yes accepts tracking, and then we disable it)
-      shell: bash
-      run: |
-          comfy --yes env 
-          comfy tracking disable
     - name: Publish Node
       shell: bash
       run: |
+          comfy --skip-prompt --no-enable-telemetry env
           comfy node publish --token ${{ inputs.personal_access_token }}
     
