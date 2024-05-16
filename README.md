@@ -6,7 +6,7 @@ Uses [comfy-cli](https://github.com/Comfy-Org/comfy-cli) to publish the current 
 
 ### Publish Node
 
-Please finish the guide [here](http://localhost:3000/custom-nodes/overview#publishing-to-the-registry) for publishing to the registry befre continuing.
+Please finish the guide [here](https://www.comfydocs.org/registry/overview#publishing-to-the-registry) for publishing to the registry befre continuing.
 
 Make sure you have:
 
@@ -28,7 +28,7 @@ Create a secret called `REGISTRY_ACCESS_TOKEN`.
 
 ### Publish when pyproject.toml changes
 
-The easiest way to publish custom node versions is to create this Github Actions workflow that runs everytime `pyproject.toml` changes. When you want to publish a new version, simply go and update the version field to the next version and commit it to main.
+The easiest way to publish custom node versions is to use this Github Actions workflow that runs everytime `pyproject.toml` changes. When you want to publish a new version, simply go and update the version field to the next version.
 
 ```yaml
 name: "Publish to Comfy registry"
@@ -45,14 +45,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Publish Custom Node
-        uses: comfy-org/publish-node-action@main # TODO replace when published.
+        uses: Comfy-Org/publish-node-action
         with:
           personal_access_token: ${{ secrets.REGISTRY_ACCESS_TOKEN }} ## Add your own personal access token to your Github secrets and reference it here.
 ```
 
-### Version Numbers
+### Notes
 
 `comfy-cli` will publish the version written in `pyproject.toml`.
 
