@@ -47,7 +47,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       - name: Publish Custom Node
-        uses: Comfy-Org/publish-node-action
+        uses: actions/Comfy-Org/publish-node-action
         with:
           personal_access_token: ${{ secrets.REGISTRY_ACCESS_TOKEN }} ## Add your own personal access token to your Github secrets and reference it here.
 ```
