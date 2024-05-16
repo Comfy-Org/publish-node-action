@@ -31,8 +31,9 @@ Create a secret called `REGISTRY_ACCESS_TOKEN`.
 The easiest way to publish custom node versions is to use this Github Actions workflow that runs everytime `pyproject.toml` changes. When you want to publish a new version, simply go and update the version field to the next version.
 
 ```yaml
-name: "Publish to Comfy registry"
+name: Publish to Comfy registry
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -47,7 +48,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       - name: Publish Custom Node
-        uses: actions/Comfy-Org/publish-node-action
+        uses: Comfy-Org/publish-node-action@main
         with:
           personal_access_token: ${{ secrets.REGISTRY_ACCESS_TOKEN }} ## Add your own personal access token to your Github secrets and reference it here.
 ```
