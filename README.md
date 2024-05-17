@@ -50,7 +50,7 @@ jobs:
       - name: Publish Custom Node
         uses: Comfy-Org/publish-node-action@main
         with:
-          personal_access_token: ${{ secrets.REGISTRY_ACCESS_TOKEN }} ## Add your own personal access token to your Github secrets and reference it here.
+          personal_access_token: ${{ secrets.REGISTRY_ACCESS_TOKEN }} ## Add your own personal access token to your Github Repository secrets and reference it here.
 ```
 
 ### Notes
