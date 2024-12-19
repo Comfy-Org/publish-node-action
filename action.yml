@@ -13,10 +13,48 @@ runs:
       uses: actions/setup-python@v5
       with:
           python-version: '3.10'
-    - name: Install comfy-cli
+    - name: Install dependencies
       shell: bash
       run: |
-          pip install comfy-cli
+          pip install comfy-cli ruff
+    - name: Run security linting
+      shell: bash
+      run: |
+          ruff check . --select=S102,S307 --target-version=py310 --exit-zero | tee ruff_output.txt
+    - name: Create PR if issues found
+      if: success()
+      shell: bash
+      run: |
+          if [ -s ruff_output.txt ]; then
+            # Create a new branch
+            git checkout -b security-review-$(date +%Y%m%d-%H%M%S)
+            
+            # Create the warning message file
+            cat << EOF > SECURITY_REVIEW.md
+            # Security Review Required
+            
+            The following potentially dangerous code patterns were found:
+            
+            \`\`\`
+            $(cat ruff_output.txt)
+            \`\`\`
+            
+            Please review these instances of \`eval()\` and \`exec()\` calls as they may pose security risks.
+            EOF
+            
+            # Commit and push
+            git add SECURITY_REVIEW.md
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git config --global user.name "github-actions[bot]"
+            git commit -m "docs: Security review required for eval/exec usage"
+            git push origin security-review-$(date +%Y%m%d-%H%M%S)
+            
+            # Create PR using GitHub CLI
+            gh pr create \
+              --title "Security Review Required: eval/exec usage detected" \
+              --body "$(cat SECURITY_REVIEW.md)" \
+              --label "security"
+          fi
     - name: Publish Node
       shell: bash
       run: |
