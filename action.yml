@@ -9,17 +9,65 @@ runs:
   steps:
     - name: Checkout Custom Node Repository
       uses: actions/checkout@v4
+      
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-          python-version: '3.10'
-    - name: Install comfy-cli
+        python-version: '3.10'
+        
+    - name: Install dependencies
       shell: bash
       run: |
-          pip install comfy-cli
+        pip install comfy-cli ruff
+        
+    - name: Run security linting
+      shell: bash
+      run: |
+        ruff check . --select=S102,S307 --target-version=py310 --exit-zero | tee ruff_output.txt
+        
+    # TODO(yoland): add a link policy page for comfy org
+    - name: Create or update issue if problems found
+      id: create_issue
+      if: success()
+      continue-on-error: true
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        # Check if we have permission to create/update issues
+        if ! gh auth status 2>/dev/null; then
+          echo "::warning::Skipping issue creation - missing required permissions (issues: write)"
+          exit 0
+        fi
+
+        if [ -s ruff_output.txt ]; then
+          # Search for existing issue with the title
+          ISSUE_NUMBER=$(gh issue list --search "Comfy Registry Security Review Required: eval/exec usage detected" --json number --jq '.[0].number')
+         
+          # Pre pare the comment body
+          COMMENT_BODY=$'# New Security Findings\n\nThe following potentially dangerous code patterns were found:\n```text\n'"$(cat ruff_output.txt)"$'\n```\nPlease review these instances of `eval()` and `exec()` calls as they may pose security risks.'
+          
+          if [ -n "$ISSUE_NUMBER" ]; then
+            # If issue exists, add a comment
+            gh issue comment $ISSUE_NUMBER --body "$COMMENT_BODY"
+          else
+            # If no issue exists, create a new one
+            gh issue create \
+              --title "Comfy Registry Security Review Required: eval/exec usage detected" \
+              --body "$COMMENT_BODY"
+          fi
+        fi
+        
+    - name: Suggest adding permissions
+      if: steps.create_issue.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::notice::To enable security issue creation, add the following to your workflow file at .github/workflows/publish_action.yml:"
+        echo "::notice::permissions:"
+        echo "::notice::  issues: write"
+
     - name: Publish Node
       shell: bash
       run: |
-          comfy --skip-prompt --no-enable-telemetry env
-          comfy node publish --token ${{ inputs.personal_access_token }}
-    
+        comfy --skip-prompt --no-enable-telemetry env
+        comfy node publish --token ${{ inputs.personal_access_token }}
