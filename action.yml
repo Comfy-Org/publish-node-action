@@ -32,6 +32,12 @@ runs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
+        # Check if we have permission to create/update issues
+        if ! gh auth status 2>/dev/null; then
+          echo "::warning::Skipping issue creation - missing required permissions (issues: write)"
+          exit 0
+        fi
+
         if [ -s ruff_output.txt ]; then
           # Search for existing issue with the title
           ISSUE_NUMBER=$(gh issue list --search "Comfy Registry Security Review Required: eval/exec usage detected" --json number --jq '.[0].number')
