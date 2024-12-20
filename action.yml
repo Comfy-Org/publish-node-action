@@ -9,40 +9,43 @@ runs:
   steps:
     - name: Checkout Custom Node Repository
       uses: actions/checkout@v4
+      
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-          python-version: '3.10'
+        python-version: '3.10'
+        
     - name: Install dependencies
       shell: bash
       run: |
-          pip install comfy-cli ruff
+        pip install comfy-cli ruff
+        
     - name: Run security linting
       shell: bash
       run: |
-          ruff check . --select=S102,S307 --target-version=py310 --exit-zero | tee ruff_output.txt
+        ruff check . --select=S102,S307 --target-version=py310 --exit-zero | tee ruff_output.txt
+        
     - name: Create issue if problems found
       if: success()
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.personal_access_token }}
       run: |
-          if [ -s ruff_output.txt ]; then
-            # Create issue using GitHub CLI
-            gh issue create \
-              --title "Comfy Registry Security Review Required: eval/exec usage detected" \
-              --body "# Security Review Required
-
-The following potentially dangerous code patterns were found:
-
-\`\`\`text
-$(cat ruff_output.txt)
-\`\`\`
-
-Please review these instances of \`eval()\` and \`exec()\` calls as they may pose security risks." \
-              --label "security"
-          fi
+        if [ -s ruff_output.txt ]; then
+          gh issue create \
+            --title "Comfy Registry Security Review Required: eval/exec usage detected" \
+            --body "# Security Review Required
+            
+            The following potentially dangerous code patterns were found:
+            \`\`\`text
+            $(cat ruff_output.txt)
+            \`\`\`
+            Please review these instances of \`eval()\` and \`exec()\` calls as they may pose security risks." \
+            --label "security"
+        fi
+        
     - name: Publish Node
       shell: bash
       run: |
-          comfy --skip-prompt --no-enable-telemetry env
-          comfy node publish --token ${{ inputs.personal_access_token }}
-    
+        comfy --skip-prompt --no-enable-telemetry env
+        comfy node publish --token ${{ inputs.personal_access_token }}
