@@ -29,7 +29,7 @@ runs:
       if: success()
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ inputs.personal_access_token }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
         if [ -s ruff_output.txt ]; then
           gh issue create \
