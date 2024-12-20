@@ -40,8 +40,7 @@ runs:
             \`\`\`text
             $(cat ruff_output.txt)
             \`\`\`
-            Please review these instances of \`eval()\` and \`exec()\` calls as they may pose security risks." \
-            --label "security"
+            Please review these instances of \`eval()\` and \`exec()\` calls as they may pose security risks."
         fi
         
     - name: Publish Node
