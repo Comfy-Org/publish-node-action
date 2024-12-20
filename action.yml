@@ -29,19 +29,14 @@ runs:
     - name: Create or update issue if problems found
       if: success()
       shell: bash
+      continue-on-error: true
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
-        # Test issue creation permissions explicitly
-        if ! gh api repos/${{ github.repository }}/issues --method POST --field title="Permission Test" --field body="Testing permissions" 2>/dev/null; then
+        # Check if we have permission to create/update issues
+        if ! gh auth status 2>/dev/null; then
           echo "::warning::Skipping issue creation - missing required permissions (issues: write)"
           exit 0
-        else
-          # Clean up test issue
-          TEST_ISSUE_NUMBER=$(gh issue list --search "Permission Test" --json number --jq '.[0].number')
-          if [ -n "$TEST_ISSUE_NUMBER" ]; then
-            gh issue close $TEST_ISSUE_NUMBER --delete
-          fi
         fi
 
         if [ -s ruff_output.txt ]; then
