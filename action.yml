@@ -27,9 +27,10 @@ runs:
         
     # TODO(yoland): add a link policy page for comfy org
     - name: Create or update issue if problems found
+      id: create_issue
       if: success()
-      shell: bash
       continue-on-error: true
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
@@ -57,6 +58,14 @@ runs:
           fi
         fi
         
+    - name: Suggest adding permissions
+      if: steps.create_issue.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::notice::To enable security issue creation, add the following to your workflow file at .github/workflows/publish_action.yml:"
+        echo "::notice::permissions:"
+        echo "::notice::  issues: write"
+
     - name: Publish Node
       shell: bash
       run: |
