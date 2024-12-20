@@ -25,6 +25,7 @@ runs:
       run: |
         ruff check . --select=S102,S307 --target-version=py310 --exit-zero | tee ruff_output.txt
         
+    # TODO(yoland): add a link policy page for comfy org
     - name: Create or update issue if problems found
       if: success()
       shell: bash
