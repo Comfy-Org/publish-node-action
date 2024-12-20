@@ -25,16 +25,28 @@ runs:
       run: |
         ruff check . --select=S102,S307 --target-version=py310 --exit-zero | tee ruff_output.txt
         
-    - name: Create issue if problems found
+    - name: Create or update issue if problems found
       if: success()
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
         if [ -s ruff_output.txt ]; then
-          gh issue create \
-            --title "Comfy Registry Security Review Required: eval/exec usage detected" \
-            --body $'# Security Review Required\n\nThe following potentially dangerous code patterns were found:\n```text\n'"$(cat ruff_output.txt)"$'\n```\nPlease review these instances of `eval()` and `exec()` calls as they may pose security risks.'
+          # Search for existing issue with the title
+          ISSUE_NUMBER=$(gh issue list --search "Comfy Registry Security Review Required: eval/exec usage detected" --json number --jq '.[0].number')
+          
+          # Prepare the comment body
+          COMMENT_BODY=$'# New Security Findings\n\nThe following potentially dangerous code patterns were found:\n```text\n'"$(cat ruff_output.txt)"$'\n```\nPlease review these instances of `eval()` and `exec()` calls as they may pose security risks.'
+          
+          if [ -n "$ISSUE_NUMBER" ]; then
+            # If issue exists, add a comment
+            gh issue comment $ISSUE_NUMBER --body "$COMMENT_BODY"
+          else
+            # If no issue exists, create a new one
+            gh issue create \
+              --title "Comfy Registry Security Review Required: eval/exec usage detected" \
+              --body "$COMMENT_BODY"
+          fi
         fi
         
     - name: Publish Node
