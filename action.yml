@@ -34,13 +34,7 @@ runs:
         if [ -s ruff_output.txt ]; then
           gh issue create \
             --title "Comfy Registry Security Review Required: eval/exec usage detected" \
-            --body "# Security Review Required
-            
-            The following potentially dangerous code patterns were found:
-            \`\`\`text
-$(cat ruff_output.txt)
-            \`\`\`
-            Please review these instances of \`eval()\` and \`exec()\` calls as they may pose security risks."
+            --body $'# Security Review Required\n\nThe following potentially dangerous code patterns were found:\n```text\n'"$(cat ruff_output.txt)"$'\n```\nPlease review these instances of `eval()` and `exec()` calls as they may pose security risks.'
         fi
         
     - name: Publish Node
