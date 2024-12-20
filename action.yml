@@ -32,17 +32,23 @@ runs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
-        # Check if we have permission to create/update issues
-        if ! gh auth status 2>/dev/null; then
+        # Test issue creation permissions explicitly
+        if ! gh api repos/${{ github.repository }}/issues --method POST --field title="Permission Test" --field body="Testing permissions" 2>/dev/null; then
           echo "::warning::Skipping issue creation - missing required permissions (issues: write)"
           exit 0
+        else
+          # Clean up test issue
+          TEST_ISSUE_NUMBER=$(gh issue list --search "Permission Test" --json number --jq '.[0].number')
+          if [ -n "$TEST_ISSUE_NUMBER" ]; then
+            gh issue close $TEST_ISSUE_NUMBER --delete
+          fi
         fi
 
         if [ -s ruff_output.txt ]; then
           # Search for existing issue with the title
           ISSUE_NUMBER=$(gh issue list --search "Comfy Registry Security Review Required: eval/exec usage detected" --json number --jq '.[0].number')
-          
-          # Prepare the comment body
+         
+          # Pre pare the comment body
           COMMENT_BODY=$'# New Security Findings\n\nThe following potentially dangerous code patterns were found:\n```text\n'"$(cat ruff_output.txt)"$'\n```\nPlease review these instances of `eval()` and `exec()` calls as they may pose security risks.'
           
           if [ -n "$ISSUE_NUMBER" ]; then
